@@ -4,20 +4,8 @@
   "description": "asset-system is a cross platform asset system for React and React-Native. This repo is the home for all asset- packages.",
   "main": "index.js",
   "scripts": {
-    "publish:provider": "mono --publish provider",
-    "publish:webpack": "mono --publish webpack",
-    "publish:parser": "mono --publish parser",
-    "publish:bundle": "mono --publish bundle",
-    "publish:list": "mono --publish list",
-    "test:provider": "mono --test provider",
-    "test:webpack": "mono --test webpack",
-    "test:parser": "mono --test parser",
-    "test:bundle": "mono --test bundle",
-    "test:list": "mono --test list",
-    "test": "mono --test",
-    "publish": "mono --publish",
-    "install": "mono --install",
-    "link": "mono --link"
+    "build": "lerna run build",
+    "test": "lerna run test"
   },
   "private": true,
   "repository": {
@@ -39,9 +27,9 @@
     "Arnout Kazemier <akazemier@godaddy.com>"
   ],
   "devDependencies": {
-    "@babel/core": "^7.1.2",
-    "@babel/preset-env": "^7.1.0",
-    "@babel/preset-react": "^7.0.0",
-    "mono-repos": "^0.1.1"
-  }
+    "lerna": "^3.13.1"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
