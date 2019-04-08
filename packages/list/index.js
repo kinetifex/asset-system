@@ -99,14 +99,9 @@ class List extends EventEmitter {
 
     const readme = [
       '# '+ path.basename(this.file),
-      '',
-      this.contents(svgs),
-      '',
-      this.details(output, svgs),
-      '',
-      '## Assets',
-      '',
-      ...svgs.map(this.asset.bind(this))
+      '', this.contents(svgs),
+      '', this.details(output, svgs),
+      '', '## Assets', '', ...svgs.map(this.asset.bind(this))
     ].join('\n');
 
     this.emit('done', readme);
@@ -164,13 +159,11 @@ Learn more about [asset-provider](https://github.com/godaddy/asset-system) compo
 
     return [
       `### ${svg.name}`,
-      '',
-      table([
+      '', table([
         [ 'name', 'width', 'height', 'preview' ],
         [ svg.name, size.width, size.height, this.embed(svg) ]
       ]),
-      '',
-      ...this.example(svg, size),
+      '', ...this.example(svg, size),
       ''
     ].join('\n');
   }
@@ -208,8 +201,7 @@ Learn more about [asset-provider](https://github.com/godaddy/asset-system) compo
    */
   example(svg, size) {
     return [
-      '```js',
-      `<Asset name="${svg.name}" width={ ${size.width} } height={ ${size.height} } />`,
+      '```js', `<Asset name="${svg.name}" width={ ${size.width} } height={ ${size.height} } />`,
       '```'
     ];
   }
@@ -310,11 +302,7 @@ Learn more about [asset-provider](https://github.com/godaddy/asset-system) compo
     iterate(categories, Object.keys(categories));
 
     return [
-      '## Table of Contents',
-      '',
-      '- [Bundle details](#bundle-details)',
-      '- [Assets](#assets)',
-      ...assets
+      '## Table of Contents', '', '- [Bundle details](#bundle-details)', '- [Assets](#assets)', ...assets
     ].join('\n');
   }
 }

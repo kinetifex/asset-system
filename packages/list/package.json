@@ -7,8 +7,8 @@
   "module": "./index",
   "react-native": "./index",
   "scripts": {
-    "test:web": "mocha --colors --require setup-env test/*.test.js",
-    "test": "nyc --reporter=text --reporter=lcov npm run test:web",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "prepublishOnly": "npm run build",
     "build": "rm -rf ./lib && babel ./index.js -d ./lib",
     "lint": "eslint-godaddy *.js ./test/*.js"
@@ -27,16 +27,14 @@
     "@babel/register": "^7.0.0",
     "asset-bundle": "latest",
     "asset-test": "latest",
-    "assume": "^1.5.2",
     "clone": "^2.1.1",
     "eslint": "^4.14.0",
     "eslint-config-godaddy": "^2.1.0",
+    "eslint-plugin-jest": "^22.4.1",
     "eslint-plugin-json": "^1.2.0",
     "eslint-plugin-mocha": "^4.11.0",
-    "mocha": "^4.1.0",
-    "nyc": "^11.4.1",
-    "puppeteer": "^1.9.0",
-    "setup-env": "^1.2.1"
+    "jest": "^24.7.1",
+    "puppeteer": "^1.9.0"
   },
   "babel": {
     "plugins": [

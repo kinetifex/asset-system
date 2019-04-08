@@ -85,8 +85,7 @@ class WebPack {
     return {
       loader: require.resolve('./loader'),
       options: {
-        external: '[path][name].[ext]',
-        internal: (file) => this.bundle.name(file)
+        external: '[path][name].[ext]', internal: (file) => this.bundle.name(file)
       }
     };
   }

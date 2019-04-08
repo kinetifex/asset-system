@@ -1,8 +1,6 @@
 import { decode } from 'asset-parser';
 import { fixtures } from 'asset-test';
-import { describe, it } from 'mocha';
 import Bundle from '../index';
-import assume from 'assume';
 import path from 'path';
 import fs from 'fs';
 
@@ -25,19 +23,15 @@ function find(ext, name) {
  * @private
  */
 const tests = [
-  'tiger',
-  'homer',
-  'homer-no-viewbox',
-  'godaddy'
+  'tiger', 'homer', 'homer-no-viewbox', 'godaddy'
 ];
 
-describe('snapshots', function () {
-  this.timeout(10 * 1000);
+describe('snapshots', () => {
 
   let bundle;
   let svgs;
 
-  before(function (next) {
+  beforeAll(function (next) {
     bundle = new Bundle(tests.map(find.bind(find, 'svg')));
 
     bundle.run(function run(err, str) {
@@ -54,12 +48,12 @@ describe('snapshots', function () {
   });
 
   tests.forEach(function each(name) {
-    it(`correctly transforms the ${name} fixture`, function () {
+    it(`correctly transforms the ${name} fixture`, () => {
       const item = svgs[name];
       const output = JSON.parse(fs.readFileSync(find('json', name), 'utf-8'));
 
-      assume(item).is.a('array');
-      assume(item).deep.equals(output);
+      expect(item).toBeInstanceOf(Array);
+      expect(item).toEqual(output);
 
       //
       // Uncomment the following line if you want to change the new snapshot:

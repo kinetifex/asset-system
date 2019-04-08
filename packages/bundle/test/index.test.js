@@ -1,154 +1,153 @@
-import { describe, it, beforeEach } from 'mocha';
 import { fixtures } from 'asset-test';
 import { decode } from 'asset-parser';
 import EventEmitter from 'events';
 import Bundle from '../index';
-import assume from 'assume';
 import path from 'path';
 
-describe('asset-bundle', function () {
+describe('asset-bundle', () => {
   const godaddy = path.join(fixtures, 'godaddy.svg');
   let bundle;
 
   function nope() { /* empty callback */ }
 
-  beforeEach(function each() {
+  beforeEach(() => {
     bundle = new Bundle([godaddy]);
   });
 
-  it('is an instance of EventEmitter', function () {
-    assume(bundle).is.instanceOf(EventEmitter);
+  it('is an instance of EventEmitter', () => {
+    expect(bundle).toBeInstanceOf(EventEmitter);
   });
 
-  it('deep merges config.svgo', function () {
+  it('deep merges config.svgo', () => {
     bundle = new Bundle([godaddy], {
       svgo: [
         { removeViewBox: true }
       ]
     });
 
-    assume(bundle.config.root).equals(null);
-    assume(bundle.config.multipass).false();
-    assume(bundle.config.svgo.length).equals(Bundle.defaults.svgo.length);
+    expect(bundle.config.root).toEqual(null);
+    expect(bundle.config.multipass).toBe(false);
+    expect(bundle.config.svgo.length).toEqual(Bundle.defaults.svgo.length);
 
     const removeViewBox = bundle.config.svgo.find(item => {
       return Object.keys(item)[0] === 'removeViewBox';
     });
 
-    assume(removeViewBox).is.an('object');
-    assume(removeViewBox.removeViewBox).true();
+    expect(removeViewBox).toBeInstanceOf(Object);
+    expect(removeViewBox.removeViewBox).toBe(true);
   });
 
-  it('exposes the constructor through module.exports', function () {
+  it('exposes the constructor through module.exports', () => {
     const BUNDLEOFJOY = require('../');
 
-    assume(BUNDLEOFJOY).is.a('function');
+    expect(typeof BUNDLEOFJOY).toBe('function');
 
     const test = new BUNDLEOFJOY([godaddy]);
 
-    assume(test.modify).is.a('function');
-    assume(test.run).is.a('function');
+    expect(test.modify).toBeInstanceOf(Function);
+    expect(test.run).toBeInstanceOf(Function);
   });
 
-  describe('#modify', function () {
-    it('is a function', function () {
-      assume(bundle.modify).is.a('function');
+  describe('#modify', () => {
+    it('is a function', () => {
+      expect(bundle.modify).toBeInstanceOf(Function);
     });
 
-    it('registers a new transformation hook', function () {
-      assume(bundle.hooks).has.length(0);
+    it('registers a new transformation hook', () => {
+      expect(Object.keys(bundle.hooks)).toHaveLength(0);
 
       const example = () => {};
       bundle.modify('name', example);
 
-      assume(bundle.hooks).has.length(1);
-      assume(bundle.hooks.name).equals(example);
+      expect(Object.keys(bundle.hooks)).toHaveLength(1);
+      expect(bundle.hooks.name).toEqual(example);
     });
   });
 
-  describe('#plugin', function () {
-    it('is a function', function () {
-      assume(bundle.plugin).is.a('function');
+  describe('#plugin', () => {
+    it('is a function', () => {
+      expect(bundle.plugin).toBeInstanceOf(Function);
     });
 
-    it('executes the supplied Constructor', function (next) {
+    it('executes the supplied Constructor', next => {
       function Test(b, o) {
-        assume(b).equals(bundle);
-        assume(o).equals(options);
+        expect(b).toEqual(bundle);
+        expect(o).toEqual(options);
 
         next();
       }
 
       const options = {};
-      assume(bundle.plugin(Test, options)).is.instanceOf(Test);
+      expect(bundle.plugin(Test, options)).toBeInstanceOf(Test);
     });
   });
 
-  describe('#name', function () {
-    it('is a function', function () {
-      assume(bundle.name).is.a('function');
+  describe('#name', () => {
+    it('is a function', () => {
+      expect(bundle.name).toBeInstanceOf(Function);
     });
 
-    it('produces the name of the asset based on the file name', function () {
+    it('produces the name of the asset based on the file name', () => {
       const loc = '/foo/bar/hello-world.svg';
       const name = bundle.name(loc);
 
-      assume(name).equals('hello-world');
+      expect(name).toEqual('hello-world');
     });
 
-    it('uses folder names as namespace when root option is provided', function () {
-      bundle = new Bundle([godaddy], {
-        root: __dirname
-      });
+    it('uses folder names as namespace when root option is provided', () => {
+        bundle = new Bundle([godaddy], {
+          root: __dirname
+        });
 
-      const loc = path.join(__dirname, 'name', 'space', 'ship.svg');
-      const name = bundle.name(loc);
+        const loc = path.join(__dirname, 'name', 'space', 'ship.svg');
+        const name = bundle.name(loc);
 
-      assume(name).equals('name/space/ship');
-    });
+        expect(name).toEqual('name/space/ship');
+      }
+    );
   });
 
-  describe('#read', function () {
-    it('is a function', function () {
-      assume(bundle.read).is.a('function');
+  describe('#read', () => {
+    it('is a function', () => {
+      expect(bundle.read).toBeInstanceOf(Function);
     });
 
-    it('reads the passed files', function (next) {
+    it('reads the passed files', next => {
       bundle.read([godaddy], function (err, svgs) {
-        assume(err).is.a('null');
-        assume(svgs).is.a('array');
-        assume(svgs).is.length(1);
+        expect(err).toBeNull();
+        expect(svgs).toBeInstanceOf(Array);
+        expect(Object.keys(svgs)).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item.name).equals('godaddy');
-        assume(item.loc).equals(godaddy);
-        assume(item.data).is.a('string');
-        assume(item.data).contains('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)');
+        expect(item.name).toEqual('godaddy');
+        expect(item.loc).toEqual(godaddy);
+        expect(typeof item.data).toBe('string');
+        expect(item.data).toContain('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)');
 
         next();
       });
     });
 
-    it('calls with error when file does not exist', function (next) {
+    it('calls with error when file does not exist', next => {
       bundle.read([path.join(fixtures, 'does-not.exist')], function (err) {
-        assume(err).is.a('error');
+        expect(err.message).toEqual(expect.stringContaining('ENOENT: no such file or directory'));
 
         next();
       });
     });
 
-    it('emits the `read` event', function (next) {
+    it('emits the `read` event', next => {
       bundle.once('read', function (err, svgs) {
-        assume(err).is.a('null');
-        assume(svgs).is.a('array');
+        expect(err).toBeNull();
+        expect(svgs).toBeInstanceOf(Array);
 
         const item = svgs[0];
 
-        assume(item.name).equals('godaddy');
-        assume(item.loc).equals(godaddy);
-        assume(item.data).is.a('string');
-        assume(item.data).contains('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)');
+        expect(item.name).toEqual('godaddy');
+        expect(item.loc).toEqual(godaddy);
+        expect(typeof item.data).toBe('string');
+        expect(item.data).toContain('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)');
 
         next();
       });
@@ -157,10 +156,10 @@ describe('asset-bundle', function () {
     });
   });
 
-  describe('#optimize', function () {
+  describe('#optimize', () => {
     let data;
 
-    before(function (next) {
+    beforeAll(function (next) {
       bundle.read([godaddy], function (err, svgs) {
         if (err) return next(err);
 
@@ -169,53 +168,51 @@ describe('asset-bundle', function () {
       });
     });
 
-    it('is a function', function () {
-      assume(bundle.optimize).is.a('function');
+    it('is a function', () => {
+      expect(bundle.optimize).toBeInstanceOf(Function);
     });
 
-    it('optimizes the svgs', function (next) {
+    it('optimizes the svgs', next => {
       bundle.optimize(data, function (err, svgs) {
-        assume(err).is.a('null');
-        assume(svgs).is.a('array');
-        assume(svgs).is.length(1);
+        expect(err).toBeNull();
+        expect(svgs).toBeInstanceOf(Array);
+        expect(Object.keys(svgs)).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item.name).equals('godaddy');
-        assume(item.loc).equals(godaddy);
-        assume(item.info).is.a('object');
-        assume(item.data).is.a('string');
-        assume(item.data).does.not.contain('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)');
+        expect(item.name).toEqual('godaddy');
+        expect(item.loc).toEqual(godaddy);
+        expect(item.info).toBeInstanceOf(Object);
+        expect(typeof item.data).toBe('string');
+        expect(item.data).not.toEqual(expect.stringContaining('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)'));
 
         next();
       });
     });
 
-    it('calls with an error on incorrect svg data', function (next) {
+    it('calls with an error on incorrect svg data', next => {
       bundle.optimize([{
-        name: 'lol',
-        data: '@not really data@',
-        loc: __filename
+        name: 'lol', data: '@not really data@', loc: __filename
       }], function (err) {
-        assume(err).is.a('error');
+        expect(err).toBeInstanceOf(Error);
 
         next();
       });
     });
 
-    it('emits the `optimize` event', function (next) {
+    it('emits the `optimize` event', next => {
       bundle.once('optimize', function (err, svgs) {
-        assume(err).is.a('null');
-        assume(svgs).is.a('array');
-        assume(svgs).is.length(1);
+        expect(err).toBeNull();
+        expect(svgs).toBeInstanceOf(Array);
+        expect(Object.keys(svgs)).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item.name).equals('godaddy');
-        assume(item.loc).equals(godaddy);
-        assume(item.info).is.a('object');
-        assume(item.data).is.a('string');
-        assume(item.data).does.not.contain('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)');
+        expect(item.name).toEqual('godaddy');
+        expect(item.loc).toEqual(godaddy);
+        expect(item.info).toBeInstanceOf(Object);
+        expect(typeof item.data).toBe('string');
+        expect(item.data).not.toEqual(expect.stringContaining('Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)'));
 
         next();
       });
@@ -224,37 +221,37 @@ describe('asset-bundle', function () {
     });
   });
 
-  describe('#parse', function () {
-    it('is a function', function () {
-      assume(bundle.optimize).is.a('function');
+  describe('#parse', () => {
+    it('is a function', () => {
+      expect(bundle.optimize).toBeInstanceOf(Function);
     });
 
-    it('parses svg data into a DOM tree', function (next) {
+    it('parses svg data into a DOM tree', next => {
       bundle.read([godaddy], function (err, data) {
         if (err) return next(err);
 
         bundle.parse(data, function (errs, svgs) {
-          assume(errs).is.a('null');
-          assume(svgs).is.a('array');
-          assume(svgs).has.length(1);
+          expect(errs).toBeNull();
+          expect(svgs).toBeInstanceOf(Array);
+          expect(svgs).toHaveLength(1);
 
           const item = svgs[0];
 
-          assume(item.tree).is.not.a('null');
+          expect(item.tree).not.toBeNull();
           next();
         });
       });
     });
 
-    it('emits the `parse` event', function (next) {
+    it('emits the `parse` event', next => {
       bundle.once('parse', function (errs, svgs) {
-        assume(errs).is.a('null');
-        assume(svgs).is.a('array');
-        assume(svgs).has.length(1);
+        expect(errs).toBeNull();
+        expect(svgs).toBeInstanceOf(Array);
+        expect(svgs).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item.tree).is.not.a('null');
+        expect(item.tree).not.toBeNull();
         next();
       });
 
@@ -264,10 +261,10 @@ describe('asset-bundle', function () {
     });
   });
 
-  describe('#traverse', function () {
+  describe('#traverse', () => {
     let data;
 
-    before(function (next) {
+    beforeAll(function (next) {
       bundle.read([godaddy], function (err, files) {
         if (err) return next(err);
 
@@ -280,25 +277,25 @@ describe('asset-bundle', function () {
       });
     });
 
-    it('is a function', function () {
-      assume(bundle.traverse).is.a('function');
+    it('is a function', () => {
+      expect(bundle.traverse).toBeInstanceOf(Function);
     });
 
-    it('transform the DOM structure in a array', function (next) {
+    it('transform the DOM structure in a array', next => {
       bundle.traverse(data, function (err, svgs) {
-        assume(err).is.a('null');
+        expect(err).toBeNull();
 
-        assume(svgs).is.a('array');
-        assume(svgs).has.length(1);
+        expect(svgs).toBeInstanceOf(Array);
+        expect(svgs).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item.struc).is.a('array');
+        expect(item.struc).toBeInstanceOf(Array);
         next();
       });
     });
 
-    it('calls the transformation hook', function (next) {
+    it('calls the transformation hook', next => {
       bundle.modify('ellipse', function (attrs, element, name) {
         if (name !== 'Ellipse') return;
 
@@ -307,31 +304,31 @@ describe('asset-bundle', function () {
       });
 
       bundle.traverse(data, function (err, svgs) {
-        assume(err).is.a('null');
+        expect(err).toBeNull();
 
         const struc = svgs[0].struc;
 
         struc[struc.length - 1].forEach(function (item) {
           if (item[0] !== 'RENAMED THE COMPONENT') return;
 
-          assume(item[1]).is.a('object');
-          assume(item[1].example).equals('cool');
+          expect(item[1]).toBeInstanceOf(Object);
+          expect(item[1].example).toEqual('cool');
 
           next();
         });
       });
     });
 
-    it('emits the `traverse` event', function (next) {
+    it('emits the `traverse` event', next => {
       bundle.once('traverse', function (err, svgs) {
-        assume(err).is.a('null');
+        expect(err).toBeNull();
 
-        assume(svgs).is.a('array');
-        assume(svgs).has.length(1);
+        expect(svgs).toBeInstanceOf(Array);
+        expect(svgs).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item.struc).is.a('array');
+        expect(item.struc).toBeInstanceOf(Array);
         next();
       });
 
@@ -339,10 +336,10 @@ describe('asset-bundle', function () {
     });
   });
 
-  describe('#viewBox', function () {
+  describe('#viewBox', () => {
     let data;
 
-    before(function (next) {
+    beforeAll(function (next) {
       bundle.read([godaddy], function (err, files) {
         if (err) return next(err);
 
@@ -355,20 +352,20 @@ describe('asset-bundle', function () {
       });
     });
 
-    it('has a viewBox function', function () {
-      assume(bundle.viewBox).is.a('function');
+    it('has a viewBox function', () => {
+      expect(bundle.viewBox).toBeInstanceOf(Function);
     });
 
-    it('emits the `viewBox` event', function (next) {
+    it('emits the `viewBox` event', next => {
       bundle.once('viewBox', function (err, svgs) {
-        assume(err).is.a('null');
+        expect(err).toBeNull();
 
-        assume(svgs).is.a('array');
-        assume(svgs).has.length(1);
+        expect(svgs).toBeInstanceOf(Array);
+        expect(svgs).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item.viewBox).is.a('string');
+        expect(typeof item.viewBox).toBe('string');
         next();
       });
 
@@ -376,10 +373,10 @@ describe('asset-bundle', function () {
     });
   });
 
-  describe('#encode', function () {
+  describe('#encode', () => {
     let data;
 
-    before(function (next) {
+    beforeAll(function (next) {
       bundle.read([godaddy], function (err, files) {
         if (err) return next(err);
 
@@ -396,23 +393,23 @@ describe('asset-bundle', function () {
       });
     });
 
-    it('is a function', function () {
-      assume(bundle.encode).is.a('function');
+    it('is a function', () => {
+      expect(bundle.encode).toBeInstanceOf(Function);
     });
 
-    it('transforms the traversed tree in the resulting bundle', function (next) {
+    it('transforms the traversed tree in the resulting bundle', next => {
       bundle.encode(data, function (err, str) {
-        assume(err).is.a('null');
-        assume(str).is.a('string');
+        expect(err).toBeNull();
+        expect(typeof str).toBe('string');
 
         next();
       });
     });
 
-    it('is encoded using `asset-parser`', function (next) {
+    it('is encoded using `asset-parser`', next => {
       bundle.encode(data, function (err, str) {
-        assume(err).is.a('null');
-        assume(str).is.a('string');
+        expect(err).toBeNull();
+        expect(typeof str).toBe('string');
 
         decode(str, function (errs, payload) {
           if (errs) return next(errs);
@@ -420,27 +417,27 @@ describe('asset-bundle', function () {
           const version = payload.version;
           const svgs = payload.data;
 
-          assume(version).equals(bundle.specification);
-          assume(svgs).is.a('object');
-          assume(svgs.godaddy).is.a('array');
-          assume(svgs.godaddy).deep.equals(data[0].struc);
+          expect(version).toEqual(bundle.specification);
+          expect(svgs).toBeInstanceOf(Object);
+          expect(svgs.godaddy).toBeInstanceOf(Array);
+          expect(svgs.godaddy).toEqual(data[0].struc);
 
           next();
         });
       });
     });
 
-    it('emits the `done` event', function (next) {
+    it('emits the `done` event', next => {
       bundle.once('done', function (err, str, svgs) {
-        assume(err).is.a('null');
-        assume(str).is.a('string');
+        expect(err).toBeNull();
+        expect(typeof str).toBe('string');
 
-        assume(svgs).is.a('array');
-        assume(svgs).has.length(1);
+        expect(svgs).toBeInstanceOf(Array);
+        expect(svgs).toHaveLength(1);
 
         const item = svgs[0];
 
-        assume(item).is.a('object');
+        expect(item).toBeInstanceOf(Object);
 
         next();
       });
@@ -449,26 +446,26 @@ describe('asset-bundle', function () {
     });
   });
 
-  describe('#run', function () {
-    it('is a function', function () {
-      assume(bundle.run).is.a('function');
+  describe('#run', () => {
+    it('is a function', () => {
+      expect(bundle.run).toBeInstanceOf(Function);
     });
 
-    it('executes all the steps', function (next) {
+    it('executes all the steps', next => {
       bundle.run(function (err, str) {
-        assume(err).is.a('null');
-        assume(str).is.a('string');
+        expect(err).toBeNull();
+        expect(typeof str).toBe('string');
 
         decode(str, function (errs, payload) {
-          assume(errs).is.a('null');
-          assume(payload).is.a('object');
+          expect(errs).toBeNull();
+          expect(payload).toBeInstanceOf(Object);
 
           const version = payload.version;
           const svgs = payload.data;
 
-          assume(version).equals(bundle.specification);
-          assume(svgs).is.a('object');
-          assume(svgs.godaddy).is.a('array');
+          expect(version).toEqual(bundle.specification);
+          expect(svgs).toBeInstanceOf(Object);
+          expect(svgs.godaddy).toBeInstanceOf(Array);
 
           next();
         });
@@ -476,17 +473,17 @@ describe('asset-bundle', function () {
     });
   });
 
-  describe('svgo', function () {
-    it('does not mangle classNames', function (next) {
+  describe('svgo', () => {
+    it('does not mangle classNames', next => {
       const fixture = path.join(fixtures, 'homer-classnames.svg');
       const bundler = new Bundle([ fixture ]);
 
       bundler.run((err, str) => {
-        assume(err).is.a('null');
-        assume(str).is.a('string');
+        expect(err).toBeNull();
+        expect(typeof str).toBe('string');
 
-        assume(str).includes('"className":"another multiple names"');
-        assume(str).includes('{"className":"classnames-on-group"}');
+        expect(str).toContain('"className":"another multiple names"');
+        expect(str).toContain('{"className":"classnames-on-group"}');
 
         next();
       });

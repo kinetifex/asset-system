@@ -23,7 +23,7 @@ const fixtures = path.join(__dirname, '..');
 
 /**
  * Create fixtures, because we really don't different dependencies for
- * React and Svgs as that will make `instanceOf` checks unreliable as they
+ * React and Svgs as that will make `toBeInstanceOf` checks unreliable as they
  * might be imported from different locations.
  *
  * @param {Object} svgs The svgs library.
@@ -70,8 +70,7 @@ function create(svgs, React) {
     },
     complex: {
       structure: [
-        ['G',
-          [
+        ['G', [
             ['Text', { y: 20, dx: '5 5' }, [
               ['TSpan', { x: 10 }, 'tspan line 1'],
               ['TSpan', { x: 10, dy: 15 }, 'tspan line 2'],

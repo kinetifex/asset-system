@@ -293,11 +293,9 @@ Provider.propTypes = {
  * @private
  */
 Provider.defaultProps = {
-  format: 'bundle',
-  preload: false,
+  format: 'bundle', preload: false,
   timeout: 10000,
-  method: 'GET',
-  parser
+  method: 'GET', parser
 };
 
 /**

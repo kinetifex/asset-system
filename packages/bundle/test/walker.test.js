@@ -1,42 +1,39 @@
-import { describe, it } from 'mocha';
 import * as walker from '../walker';
-import assume from 'assume';
-
-describe('walker', function () {
-  describe('#componentName', function () {
-    it('transforms svg elements to svgs component names', function () {
-      assume(walker.componentName('tspan')).equals('TSpan');
-      assume(walker.componentName('path')).equals('Path');
-      assume(walker.componentName('radialGradient')).equals('RadialGradient');
+describe('walker', () => {
+  describe('#componentName', () => {
+    it('transforms svg elements to svgs component names', () => {
+      expect(walker.componentName('tspan')).toEqual('TSpan');
+      expect(walker.componentName('path')).toEqual('Path');
+      expect(walker.componentName('radialGradient')).toEqual('RadialGradient');
     });
   });
 
-  describe('#attributes', function () {
-    it('camelCases the attributes', function () {
+  describe('#attributes', () => {
+    it('camelCases the attributes', () => {
       const result = walker.attributes({
         'stroke-width': '10px'
       });
 
-      assume(result).has.length(1);
-      assume(result.strokeWidth).equals('10px');
+      expect(Object.keys(result)).toHaveLength(1);
+      expect(result.strokeWidth).toEqual('10px');
     });
 
-    it('renames properties if needed', function () {
+    it('renames properties if needed', () => {
       const result = walker.attributes({
         class: 'blue'
       });
 
-      assume(result).has.length(1);
-      assume(result.className).equals('blue');
+      expect(Object.keys(result)).toHaveLength(1);
+      expect(result.className).toEqual('blue');
     });
 
-    it('transforms values to number when possible', function () {
+    it('transforms values to number when possible', () => {
       const result = walker.attributes({
         height: '10'
       });
 
-      assume(result).has.length(1);
-      assume(result.height).equals(10);
+      expect(Object.keys(result)).toHaveLength(1);
+      expect(result.height).toEqual(10);
     });
   });
 });

@@ -1,68 +1,66 @@
 import { Pass, Through } from '../passthrough';
-import { describe, it } from 'mocha';
 import { shallow } from 'enzyme';
-import assume from 'assume';
 import React from 'react';
 
-describe('passthrough', function () {
+describe('passthrough', () => {
   let wrapper;
   let pass;
 
-  describe('<Pass />', function () {
+  describe('<Pass />', () => {
     function setup(props = {}) {
       wrapper = shallow(<Pass { ...props }><div /></Pass>);
       pass = wrapper.instance();
     }
 
-    it('exported as function', function () {
-      assume(Pass).is.a('function');
+    it('exported as function', () => {
+      expect(Pass).toBeInstanceOf(Function);
     });
 
-    describe('#modify', function () {
-      it('is a function', function () {
+    describe('#modify', () => {
+      it('is a function', () => {
         setup();
 
-        assume(pass.modify).is.a('function');
+        expect(pass.modify).toBeInstanceOf(Function);
       });
 
-      it('returns the modifiers', function () {
+      it('returns the modifiers', () => {
         const modify = { name: () => {} };
         const props = { foo: 'bar', bar: 'foo', modify };
 
         setup(props);
-        assume(pass.modify()).equals(modify);
+        expect(pass.modify()).toEqual(modify);
       });
 
-      it('is shared through React context', function () {
+      it('is shared through React context', () => {
         setup();
 
-        assume(pass.getChildContext().modify).equals(pass.modify);
+        expect(pass.getChildContext().modify).toEqual(pass.modify);
       });
     });
 
-    describe('#pass', function () {
-      it('is a function', function () {
+    describe('#pass', () => {
+      it('is a function', () => {
         setup();
 
-        assume(pass.pass).is.a('function');
+        expect(pass.pass).toBeInstanceOf(Function);
       });
 
-      it('passes the received props throught he pass function', function () {
+      it('passes the received props throught he pass function', () => {
         const props = { foo: 'bar', bar: 'foo' };
         setup(props);
 
-        assume(pass.pass()).deep.equals(props);
+        expect(pass.pass()).toEqual(props);
       });
 
-      it('is shared through React context', function () {
+      it('is shared through React context', () => {
         setup();
 
-        assume(pass.getChildContext().pass).equals(pass.pass);
+        expect(pass.getChildContext().pass).toEqual(pass.pass);
       });
     });
   });
 
-  describe('<Through />', function () {
+  describe('<Through />', () => {
     function setup(props, data = {}, modify = {}) {
       wrapper = shallow(<Through { ...props }><div/></ Through>, {
         context: {
@@ -76,11 +74,11 @@ describe('passthrough', function () {
       });
     }
 
-    it('exported as a function', function () {
-      assume(Through).is.a('function');
+    it('exported as a function', () => {
+      expect(Through).toBeInstanceOf(Function);
     });
 
-    it('only allows a single component', function (next) {
+    it('only allows a single component', next => {
       try {
         shallow(<Through><div/><div /></Through>, {
           context: {
@@ -93,104 +91,104 @@ describe('passthrough', function () {
           }
         });
       } catch (e) {
-        assume(e.message).contains('single React element');
+        expect(e.message).toContain('single React element');
         return next();
       }
     });
 
-    it('passes the props to the child component', function () {
+    it('passes the props to the child component', () => {
       setup({ className: 'bar' });
 
-      assume(wrapper.first()).to.have.tagName('div');
-      assume(wrapper.first()).to.have.className('bar');
+      expect(wrapper.first().name()).toEqual('div');
+      expect(wrapper.first().hasClass('bar')).toBe(true);
     });
 
-    it('calls the modify functions with attributes', function () {
+    it('calls the modify functions with attributes', () => {
       setup({}, { className: 'red' }, {
         className: [(attributes) => {
-          assume(attributes).is.a('object');
+          expect(attributes).toBeInstanceOf(Object);
           attributes.className = 'blue';
         }]
       });
 
-      assume(wrapper.first()).to.have.className('blue');
+      expect(wrapper.first().hasClass('blue')).toBe(true);
     });
 
-    it('only triggers the modifier if we have a matching property', function () {
+    it('only triggers the modifier if we have a matching property', () => {
       setup({}, { className: 'red' }, {
         another: [(attributes) => {
           throw new Error('I should never be called');
         }],
         className: [(attributes) => {
-          assume(attributes).is.a('object');
+          expect(attributes).toBeInstanceOf(Object);
           attributes.className = 'blue';
         }]
       });
 
-      assume(wrapper.first()).to.have.className('blue');
+      expect(wrapper.first().hasClass('blue')).toBe(true);
     });
 
-    it('triggers all assigned modifiers for a given property', function () {
+    it('triggers all assigned modifiers for a given property', () => {
       setup({}, { className: 'red' }, {
         className: [(attributes) => {
-          assume(attributes).is.a('object');
+          expect(attributes).toBeInstanceOf(Object);
           attributes.className = 'blue';
         }, (attributes) => {
-          assume(attributes.className).equals('blue');
+          expect(attributes.className).toEqual('blue');
           attributes.id = 'foo';
         }]
       });
 
-      assume(wrapper.html()).to.contain('<div class="blue" id="foo"></div>');
+      expect(wrapper.html()).toContain('<div class="blue" id="foo"></div>');
     });
 
-    it('calls all modifiers for matching props', function () {
+    it('calls all modifiers for matching props', () => {
       setup({}, { className: 'red', id: 'foo' }, {
         className: [(attributes) => {
-          assume(attributes).is.a('object');
+          expect(attributes).toBeInstanceOf(Object);
           attributes.className = 'blue';
         }],
         id: [(attributes, props) => {
-          assume(attributes.className).equals('blue');
+          expect(attributes.className).toEqual('blue');
           attributes.id = props.id;
         }]
       });
 
-      assume(wrapper.html()).to.contain('<div class="blue" id="foo"></div>');
+      expect(wrapper.html()).toContain('<div class="blue" id="foo"></div>');
     });
 
-    it('receives the props as arguments', function (next) {
+    it('receives the props as arguments', next => {
       const cows = { cows: 'moo' };
 
       setup({ className: 'red' }, cows, {
         cows: [(attributes, props) => {
-          assume(attributes).is.a('object');
-          assume(props).is.a('object');
-          assume(props).deep.equals(cows);
+          expect(attributes).toBeInstanceOf(Object);
+          expect(props).toBeInstanceOf(Object);
+          expect(props).toEqual(cows);
 
           next();
         }]
       });
 
-      assume(wrapper.html()).to.contain('<div class="red"></div>');
+      expect(wrapper.html()).toContain('<div class="red"></div>');
     });
 
-    it('receives the child as arguments', function (next) {
+    it('receives the child as arguments', next => {
       setup({}, { trigger: 'red' }, {
         trigger: [(attributes, props, child) => {
-          assume(child.props).is.a('object');
-          assume(child.type).equals('div');
+          expect(child.props).toBeInstanceOf(Object);
+          expect(child.type).toEqual('div');
 
           next();
         }]
       });
     });
 
-    it('can change the child component', function () {
+    it('can change the child component', () => {
       setup({ className: 'red' }, { trigger: 'blue' }, {
         trigger: [(attributes, props, child) => {
-          assume(child.props).is.a('object');
-          assume(child.type).equals('div');
+          expect(child.props).toBeInstanceOf(Object);
+          expect(child.type).toEqual('div');
 
           return (
             <span>changed</span>
@@ -198,7 +196,7 @@ describe('passthrough', function () {
         }]
       });
 
-      assume(wrapper.html()).to.contain('<span class="red">changed</span>');
+      expect(wrapper.html()).toContain('<span class="red">changed</span>');
     });
   });
 });

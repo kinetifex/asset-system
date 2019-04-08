@@ -1,7 +1,6 @@
 export const complex = {
   complex: [
-    ['G',
-      [
+    ['G', [
         ['Text', { y: 20, dx: '5 5' }, [
           ['TSpan', { x: 10 }, 'tspan line 1'],
           ['TSpan', { x: 10, dy: 15 }, 'tspan line 2'],
